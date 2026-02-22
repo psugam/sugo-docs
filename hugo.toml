@@ -1,4 +1,4 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://sugo-docs.pokharelsugam19.workers.dev/'
 languageCode = 'en-US'
 title = "SUGO"
 theme = "mytheme"
