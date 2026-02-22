@@ -1,0 +1,121 @@
+{{- $ui := site.Params.ui -}}
+{{- $features := site.Params.features -}}
+{{- $mathEnabledGlobally := ne $features.enableMath false -}}
+{{- $mathEnabledForPage := and .IsPage $mathEnabledGlobally (.Param "math") -}}
+{{- $mathJaxScript := $ui.mathJaxScript | default "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" -}}
+{{- $titleSeparator := $ui.titleSeparator | default " | " -}}
+{{- $themeStorageKey := $ui.themeStorageKey | default "mytheme-color-scheme" -}}
+{{- $themeToggleEnabled := ne $features.enableThemeToggle false -}}
+{{- $themeDefault := "light" -}}
+{{- if $themeToggleEnabled -}}
+  {{- if eq (lower ($ui.themeDefault | default "light")) "dark" -}}
+    {{- $themeDefault = "dark" -}}
+  {{- end -}}
+{{- else -}}
+  {{- if eq (lower ($features.fixedThemeWhenToggleOff | default "light")) "dark" -}}
+    {{- $themeDefault = "dark" -}}
+  {{- end -}}
+{{- end -}}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ printf "%s%s%s" .Title $titleSeparator site.Title }}{{ end }}</title>
+{{- if gt (len .Sites) 1 }}
+  {{- if .IsTranslated }}
+    {{- range .AllTranslations }}
+      <link rel="alternate" hreflang="{{ .Language.LanguageCode }}" href="{{ .Permalink }}">
+    {{- end }}
+  {{- else }}
+    <link rel="alternate" hreflang="{{ .Language.LanguageCode }}" href="{{ .Permalink }}">
+  {{- end }}
+{{- end }}
+{{- if .IsPage }}
+  {{- $authorsMeta := "" -}}
+  {{- $categoriesMeta := "" -}}
+  {{- $tagsMeta := "" -}}
+  {{- with .Params.categories -}}
+    {{- if reflect.IsSlice . -}}
+      {{- $categoriesMeta = delimit . ", " -}}
+    {{- else -}}
+      {{- $categoriesMeta = printf "%v" . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- with .Params.tags -}}
+    {{- if reflect.IsSlice . -}}
+      {{- $tagsMeta = delimit . ", " -}}
+    {{- else -}}
+      {{- $tagsMeta = printf "%v" . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- with .Params.authors -}}
+    {{- if reflect.IsSlice . -}}
+      {{- $authorsMeta = delimit . ", " -}}
+    {{- else -}}
+      {{- $authorsMeta = printf "%v" . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if and (eq $authorsMeta "") .Params.author -}}
+    {{- if reflect.IsSlice .Params.author -}}
+      {{- $authorsMeta = delimit .Params.author ", " -}}
+    {{- else -}}
+      {{- $authorsMeta = printf "%v" .Params.author -}}
+    {{- end -}}
+  {{- end -}}
+  <meta data-pagefind-meta="title" content="{{ .Title }}">
+  {{- with .Params.subtitle }}<meta data-pagefind-meta="subtitle" content="{{ . }}">{{ end -}}
+  {{- with .Params.description }}<meta data-pagefind-meta="description" content="{{ . }}">{{ end -}}
+  {{- with .Type }}<meta data-pagefind-meta="type" content="{{ . }}">{{ end -}}
+  {{- with .Section }}<meta data-pagefind-meta="section" content="{{ . }}">{{ end -}}
+  {{- with $categoriesMeta }}<meta data-pagefind-meta="categories" content="{{ . }}">{{ end -}}
+  {{- with $tagsMeta }}<meta data-pagefind-meta="tags" content="{{ . }}">{{ end -}}
+  {{- with $authorsMeta }}<meta data-pagefind-meta="authors" content="{{ . }}">{{ end -}}
+{{- end }}
+<script>
+(function () {
+  try {
+    var storageKey = {{ $themeStorageKey | jsonify }};
+    var defaultTheme = {{ $themeDefault | jsonify }};
+    var themeToggleEnabled = {{ $themeToggleEnabled | jsonify }};
+    var fixedThemeWhenToggleOff = {{ ($features.fixedThemeWhenToggleOff | default "light") | jsonify }};
+    window.__MYTHEME_STORAGE_KEY__ = storageKey;
+    window.__MYTHEME_DEFAULT_THEME__ = defaultTheme;
+    window.__MYTHEME_THEME_TOGGLE_ENABLED__ = themeToggleEnabled;
+    window.__MYTHEME_FIXED_THEME__ = fixedThemeWhenToggleOff;
+    var theme = defaultTheme;
+    if (themeToggleEnabled) {
+      var storedTheme = localStorage.getItem(storageKey);
+      var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      theme = storedTheme === "light" || storedTheme === "dark" ? storedTheme : (prefersDark ? "dark" : "light");
+    } else {
+      theme = fixedThemeWhenToggleOff === "dark" ? "dark" : "light";
+    }
+    if (theme !== "light" && theme !== "dark") {
+      theme = defaultTheme;
+    }
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (error) {
+    document.documentElement.setAttribute("data-theme", {{ $themeDefault | jsonify }});
+  }
+})();
+</script>
+{{- if $mathEnabledForPage }}
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [["$", "$"], ["\\(", "\\)"]],
+    displayMath: [["$$", "$$"], ["\\[", "\\]"]],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: "ams"
+  },
+  options: {
+    skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+  },
+  chtml: {
+    scale: 1
+  }
+};
+</script>
+<script id="mathjax-script" defer src="{{ $mathJaxScript | safeURL }}"></script>
+{{- end }}
+{{ partialCached "head/fonts.html" . }}
+{{ partialCached "head/css.html" . }}
