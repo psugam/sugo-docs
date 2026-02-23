@@ -6,5 +6,8 @@
     "build:hugo": "hugo --gc --minify",
     "build:search": "npx -y pagefind --site public --output-path public/pagefind",
     "build": "hugo --gc --minify && npx -y pagefind --site public --output-path public/pagefind"
+  },
+  "devDependencies": {
+    "hugo-extended": "^0.146.0"
   }
 }
