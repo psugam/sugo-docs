@@ -2362,6 +2362,12 @@ html[data-theme="dark"] .article-share__list img {
   background: transparent !important;
 }
 
+.lit-codeblock .highlight > div,
+.lit-codeblock .highlight table {
+  width: max-content;
+  min-width: 100%;
+}
+
 .lit-codeblock pre {
   margin: 0;
   padding: 0.92rem 1rem;
@@ -2375,7 +2381,8 @@ html[data-theme="dark"] .article-share__list img {
 }
 
 .lit-codeblock .lntable {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
 }
 
