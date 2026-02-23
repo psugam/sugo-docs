@@ -3,6 +3,7 @@ languageCode = 'en-US'
 title = "SUGO"
 theme = "mytheme"
 readingSpeed = 212
+disablePathToLower=true
 
 [taxonomies]
 tag = "tags"

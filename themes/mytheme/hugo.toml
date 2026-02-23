@@ -2,6 +2,7 @@ baseURL = 'https://example.org/'
 languageCode = 'en-US'
 title = "My New Hugo Site"
 readingSpeed = 212
+disablePathToLower=true
 
 [taxonomies]
 tag = "tags"
