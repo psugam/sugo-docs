@@ -64,8 +64,9 @@ git submodule add https://github.com/psugam/sugo themes/sugo
 #### 3. Copy starter content/config
 
 {{<codeblock lang="bash">}}
-cp -r themes/sugo/content ./
+cp -r themes/sugo/exampleSite/content ./
 cp -r themes/sugo/hugo.toml ./
+cp -r themes/sugo/assets ./
 {{</codeblock>}}
 
 {{<admonition type="warning" title="Important">}}
